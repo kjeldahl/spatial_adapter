@@ -199,3 +199,24 @@ module SpatialColumn
 
 
 end
+
+#add support for sexy spatial migrations
+module ActiveRecord
+  module ConnectionAdapters
+    class TableDefinition
+      # Adds a column or columns of a specified spatial type
+      # ===== Examples
+      #  t.string(:goat)
+      #  t.string(:goat, :sheep)
+      %w(  geometry point linestring polygon multipoint multilinestring multipolygon geometrycollection ).each do |column_type|
+        class_eval <<-EOV
+          def #{column_type}(*args)
+            options = args.extract_options!
+            column_names = args
+            column_names.each { |name| column(name, '#{column_type}', options) }
+          end
+        EOV
+      end	
+    end
+  end
+end
