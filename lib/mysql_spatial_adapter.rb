@@ -46,6 +46,8 @@ ActiveRecord::Base.class_eval do
             attrs[attr]= MultiPoint.from_points([value.lower_corner,value.upper_corner])
           end
           "MBRIntersects(?, #{table_name}.#{connection.quote_column_name(attr)}) " 
+        elsif ActiveRecord::VERSION::STRING.starts_with?("2.3")
+          "#{table_name}.#{attribute_condition(connection.quote_column_name(attr), value)}"
         else
           #original stuff
           "#{table_name}.#{connection.quote_column_name(attr)} #{attribute_condition(value)}"
@@ -63,6 +65,8 @@ ActiveRecord::Base.class_eval do
             attrs[attr.to_sym]=MultiPoint.from_points([value.lower_corner,value.upper_corner])
           end
           "MBRIntersects(?, #{table_name}.#{connection.quote_column_name(attr)}) " 
+        elsif ActiveRecord::VERSION::STRING.starts_with?("2.3")
+          "#{table_name}.#{attribute_condition(connection.quote_column_name(attr), value)}"
         else
           #original stuff
           # Extract table name from qualified attribute names.
