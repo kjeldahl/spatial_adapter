@@ -35,8 +35,11 @@ ActiveRecord::SchemaDumper.class_eval do
         tbl.print ", :id => false"
       end
       tbl.print ", :force => true"
-      tbl.puts " do |t|"
+      
+      options = @connection.options_for(table)                #[SA]
+      tbl.print %Q(, :options => "#{options}") unless options.blank? #[SA]
 
+      tbl.puts " do |t|"
       column_specs = columns.map do |column|
         raise StandardError, "Unknown type '#{column.sql_type}' for column '#{column.name}'" if @types[column.type].nil?
         next if column.name == pk
